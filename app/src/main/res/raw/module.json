@@ -1,0 +1,12 @@
+{
+  "name": "stepcounter",
+  "_version": 1.0,
+  "tables": [
+    {
+      "name": "steps",
+      "columns": [
+        { "name": "stepcount", "dataType": "INTEGER" }
+      ]
+    }
+  ]
+}
