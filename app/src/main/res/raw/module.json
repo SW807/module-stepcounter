@@ -1,6 +1,7 @@
 {
   "name": "stepcounter",
   "_version": 1.0,
+  "_description": "Stores steps detected every minute."
   "tables": [
     {
       "name": "steps",
