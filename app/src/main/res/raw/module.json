@@ -1,5 +1,6 @@
 {
   "name": "stepcounter",
+  "_userfriendlyname": "Skridt tæller",
   "_version": 1.0,
   "_description": "Måler og opbevarer skridt registreret for hvert minut."
   "tables": [
