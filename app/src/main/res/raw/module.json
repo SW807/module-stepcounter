@@ -1,7 +1,7 @@
 {
   "name": "stepcounter",
   "_version": 1.0,
-  "_description": "Stores steps detected every minute."
+  "_description": "Måler og opbevarer skridt registreret for hvert minut."
   "tables": [
     {
       "name": "steps",
