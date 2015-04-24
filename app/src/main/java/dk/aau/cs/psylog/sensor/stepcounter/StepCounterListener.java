@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import dk.aau.cs.psylog.module_lib.DBAccessContract;
 import dk.aau.cs.psylog.module_lib.ISensor;
@@ -25,10 +27,23 @@ public class StepCounterListener implements SensorEventListener, ISensor{
     private int sensorDelay;
     ContentResolver cr;
 
+    private Timer timer;
+    private TimerTask timerTask;
+    private int stepCount = 0;
+
     public StepCounterListener(Context context)
     {
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         cr = context.getContentResolver();
+
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                writeToDB(stepCount);
+                stepCount = 0;
+            }
+        };
+
     }
 
 
@@ -36,16 +51,19 @@ public class StepCounterListener implements SensorEventListener, ISensor{
     public void startSensor() {
         Sensor countSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         if(countSensor != null) {
-            Calendar c = Calendar.getInstance();
-            minute = c.get(Calendar.MINUTE);
             sensorManager.unregisterListener(this);
             sensorManager.registerListener(this, countSensor, sensorDelay);
+            if(timer == null)
+                timer = new Timer();
+            timer.schedule(timerTask, 1000, 60000);
         }
     }
 
     @Override
     public void stopSensor() {
         sensorManager.unregisterListener(this);
+        timer.cancel();
+        timer.purge();
     }
 
     @Override
@@ -53,25 +71,16 @@ public class StepCounterListener implements SensorEventListener, ISensor{
         sensorDelay = intent.getIntExtra("sensorDelay", SensorManager.SENSOR_DELAY_UI);
     }
 
-    int stepCount = 0;
-    int minute = 0;
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-            Calendar c = Calendar.getInstance();
             stepCount++;
-            if (c.get(Calendar.MINUTE) != minute) {
-                writeToDB(stepCount);
-                minute = c.get(Calendar.MINUTE);
-                stepCount = 0;
-            }
-
         }
     }
 
     private void writeToDB(int count)
     {
-        Uri uri = Uri.parse(DBAccessContract.DBACCESS_CONTENTPROVIDER + "stepcounter_steps");
+        Uri uri = Uri.parse(DBAccessContract.DBACCESS_CONTENTPROVIDER + "STEPCOUNTER_steps");
         ContentValues values = new ContentValues();
         values.put("stepcount", count);
         cr.insert(uri, values);
