@@ -74,12 +74,14 @@ public class StepCounterListener implements SensorEventListener, ISensor{
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            Log.i("StepCounter", "Registered step");
             stepCount++;
         }
     }
 
     private void writeToDB(int count)
     {
+        Log.i("StepCounter", "Writing " + count);
         Uri uri = Uri.parse(DBAccessContract.DBACCESS_CONTENTPROVIDER + "STEPCOUNTER_steps");
         ContentValues values = new ContentValues();
         values.put("stepcount", count);
